@@ -3,7 +3,7 @@ name: qc_env
 channels:
   - defaults
   - bioconda
-  - conda-forge
+  - conda-forge 
 dependencies:
   - fastqc
   - multiqc
