@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# Script to run VSeq-Toolkit with Mode 3 (Integration Site detection only)
+# Modes 1 and 2 are disabled. This setup matches the analysis used in the thesis.
+
+# Activate conda environment (edit this line if needed)
+source /path/to/conda.sh
+conda activate vseq_env
+
+# Define VSeq path
+VSEQ_PATH=/path/to/VSeq-Toolkit
+
+# Define temporary config file
+CONFIG_FILE=config_mode3_only_temp.txt
+
+# Write config content into the temp config file
+cat > $CONFIG_FILE << EOF
+# VSeq-Toolkit configuration for Mode 3 only (Integration Site detection)
+
+# General Parameters
+file1=/path/to/sample_R1.fastq.gz
+file2=/path/to/sample_R2.fastq.gz
+outDir=/path/to/output/
+bin=\$VSEQ_PATH/scripts/
+qua=20
+lenPer=50
+adapter1=GATCGGAAGAGCACACGTCTGAACTCCAGTCAC
+adapter2=AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGTAGATCTCGGTGGTCGCCGTATCATT
+trimmer=\$VSEQ_PATH/thirdPartyTools/skewer
+aligner=\$VSEQ_PATH/thirdPartyTools/bwa
+samtools=\$VSEQ_PATH/thirdPartyTools/samtools
+mode=default
+
+# Mode 1: OFF
+contAna=false
+
+# Mode 2: OFF
+vecVecFusion=false
+
+# Mode 3: ON
+vecGenIS=true
+vecRef=/path/to/vector.fa
+vecGenRef=/path/to/human_vector_concat.fa
+stringencyVecGen=low
+UMthresholdVecGen=0.95
+minMapSpanVecGen=20
+distVecGen=10
+opVecGen=5
+idenVecGen=95
+clusterRange=3
+annoTable=/path/to/refSeqUCSCTablehg38.txt
+bedtools=\$VSEQ_PATH/thirdPartyTools/bedtools
+EOF
+
+# Run VSeq
+python \$VSEQ_PATH/vseq.py \$CONFIG_FILE
