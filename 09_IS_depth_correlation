@@ -1,0 +1,31 @@
+# Language: R
+# Script: Correlate IS count with sequencing depth
+# Description: Assess the relationship between IS detection and sequencing depth
+
+library(ggplot2)
+
+# Manually input IS counts and read depths per sample
+# Replace values with actual data from your project
+sample_stats <- data.frame(
+  Sample = c("Sample1", "Sample2", "Sample3"),
+  IS_Count = c(124, 88, 197),           # Replace with actual IS counts
+  Sequencing_Depth = c(30e6, 22e6, 45e6) # Replace with actual read depths
+)
+
+# Scatter plot with correlation
+ggplot(sample_stats, aes(x = Sequencing_Depth / 1e6, y = IS_Count, label = Sample)) +
+  geom_point(size = 3) +
+  geom_text(vjust = -1) +
+  labs(
+    title = "Correlation Between Sequencing Depth and IS Count",
+    x = "Sequencing Depth (Million Reads)",
+    y = "Number of Integration Sites (IS)"
+  ) +
+  theme_minimal()
+
+# Save figure
+ggsave("IS_vs_Sequencing_Depth.pdf", width = 6, height = 4)
+
+# Optional: Pearson correlation
+cor_test <- cor.test(sample_stats$IS_Count, sample_stats$Sequencing_Depth)
+print(cor_test)
