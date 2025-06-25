@@ -1,0 +1,10 @@
+#!/bin/bash
+# Align reads to the reference genome using BWA
+
+REF_GENOME="hg38.fa"
+READ1="sample_R1.fastq.gz"
+READ2="sample_R2.fastq.gz"
+OUT_PREFIX="sample_aligned"
+
+bwa mem -t 8 $REF_GENOME $READ1 $READ2 > ${OUT_PREFIX}.sam
+
