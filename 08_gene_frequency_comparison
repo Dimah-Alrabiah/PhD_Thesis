@@ -1,0 +1,39 @@
+# Language: R
+# Script: Compare gene frequency of IS
+# Description: Rank genes by IS count across samples to identify frequently targeted genes
+
+library(tidyverse)
+
+# Load annotated site result files
+ann_m1 <- read.delim("sample1_annotated_sites.txt")
+ann_m2 <- read.delim("sample2_annotated_sites.txt")
+ann_m3 <- read.delim("sample3_annotated_sites.txt")
+
+# Add sample identifiers
+ann_m1$sample <- "Sample1"
+ann_m2$sample <- "Sample2"
+ann_m3$sample <- "Sample3"
+
+# Combine
+all_ann <- bind_rows(ann_m1, ann_m2, ann_m3)
+
+# Count IS per gene
+gene_counts <- all_ann %>%
+  filter(!is.na(Gene)) %>%
+  group_by(Gene) %>%
+  summarise(IS_count = n()) %>%
+  arrange(desc(IS_count))
+
+# Save the results
+write.table(gene_counts, "IS_gene_frequency_summary.txt", sep = "\t", quote = FALSE, row.names = FALSE)
+
+# Optional: plot top 10 genes
+top_genes <- gene_counts %>% slice_max(order_by = IS_count, n = 10)
+
+ggplot(top_genes, aes(x = reorder(Gene, IS_count), y = IS_count)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  coord_flip() +
+  labs(title = "Top 10 Genes with Most Integration Events", x = "Gene", y = "Number of IS") +
+  theme_minimal()
+
+ggsave("Top10_IS_target_genes.pdf", width = 6, height = 4)
