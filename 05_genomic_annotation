@@ -1,0 +1,36 @@
+# Language: R
+# Script: Genomic annotation of integration sites
+# Description: Annotate IS with gene features (intron, exon, intergenic, promoter)
+# Input: Filtered IS files from VSeq
+# Output: Annotated IS table
+
+library(GenomicRanges)
+library(rtracklayer)
+library(GenomicFeatures)
+library(tidyverse)
+
+# Load the GTF or TxDb annotation
+gtf <- import('reference_annotation.gtf')  # replace with your GTF path
+
+# Convert GTF to TxDb if needed
+# txdb <- makeTxDbFromGFF("reference_annotation.gtf")
+
+# Load filtered IS data
+IS_m1 <- read.delim("sample1_filtered_IS.txt")
+IS_m2 <- read.delim("sample2_filtered_IS.txt")
+IS_m3 <- read.delim("sample3_filtered_IS.txt")
+
+# Convert IS data to GRanges
+IS_gr_m1 <- GRanges(seqnames = IS_m1$Chr,
+                    ranges = IRanges(start = IS_m1$Position, end = IS_m1$Position),
+                    strand = IS_m1$Strand)
+# Repeat for m2 and m3 as needed...
+
+# Example annotation with rtracklayer
+overlap_m1 <- findOverlaps(IS_gr_m1, gtf)
+annotated_IS_m1 <- cbind(IS_m1[queryHits(overlap_m1), ], as.data.frame(gtf[subjectHits(overlap_m1)]))
+
+# Save the annotated table
+write.table(annotated_IS_m1, file = "sample1_annotated_IS.txt", sep = "\t", row.names = FALSE, quote = FALSE)
+
+# Repeat the overlap and write for m2, m3 if needed
