@@ -1,0 +1,32 @@
+# Language: R
+# Script: Visualise integration site distribution
+# Description: Plot bar charts of IS distribution across genomic features
+
+library(tidyverse)
+
+# Load the feature summary files
+feat_m1 <- read.delim("sample1_feature_summary.txt")
+feat_m2 <- read.delim("sample2_feature_summary.txt")
+feat_m3 <- read.delim("sample3_feature_summary.txt")
+
+# Add sample names
+feat_m1$sample <- "Sample1"
+feat_m2$sample <- "Sample2"
+feat_m3$sample <- "Sample3"
+
+# Combine data
+all_feat <- bind_rows(feat_m1, feat_m2, feat_m3)
+
+# Create bar plot
+ggplot(all_feat, aes(x = feature_group, y = percent, fill = sample)) +
+  geom_bar(stat = "identity", position = position_dodge()) +
+  labs(
+    title = "Distribution of Integration Sites Across Genomic Features",
+    x = "Genomic Feature",
+    y = "Percentage of IS",
+    fill = "Sample"
+  ) +
+  theme_minimal()
+
+# Save plot
+ggsave("IS_feature_distribution_plot.pdf", width = 8, height = 5)
